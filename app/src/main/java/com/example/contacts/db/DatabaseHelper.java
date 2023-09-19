@@ -68,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<Contact> getAllContacts(){
         ArrayList<Contact> contacts = new ArrayList<>();
-        String selectQuery = "SELECT * FROM "+ Contact.TABLE_NAME+" ORDER BY "+ Contact.COLUMN_ID + "DESC";
+        String selectQuery = "SELECT * FROM "+ Contact.TABLE_NAME+" ORDER BY "+ Contact.COLUMN_ID + " DESC";
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(selectQuery,null);
         if(cursor.moveToFirst()){

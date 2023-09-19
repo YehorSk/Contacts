@@ -44,8 +44,10 @@ public class Contact {
     }
 
     // SQL Query
-    public static final String CREATE_TABLE = "CREATE TABLE"+TABLE_NAME+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
-            COLUMN_NAME+" TEXT,"+
-            COLUMN_EMAIL+" TEXT,"+
-            COLUMN_DATE+" DATETIME DEFAULT CURRENT_TIMESTAMP)";
+    public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+            COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COLUMN_NAME + " TEXT, " +
+            COLUMN_EMAIL + " TEXT, " +
+            COLUMN_DATE + " DATETIME DEFAULT CURRENT_TIMESTAMP" +
+            ");";
 }
