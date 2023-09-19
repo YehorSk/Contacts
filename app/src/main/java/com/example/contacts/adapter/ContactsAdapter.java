@@ -62,12 +62,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
             contact_img = itemView.findViewById(R.id.image_profile);
             contact_name = itemView.findViewById(R.id.text_name);
             contact_email = itemView.findViewById(R.id.text_email);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                }
-            });
         }
     }
 }
