@@ -8,24 +8,29 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.contacts.adapter.ContactsAdapter;
-import com.example.contacts.db.Contact;
-import com.example.contacts.db.DatabaseHelper;
+import com.example.contacts.db.ContactsAppDatabase;
+import com.example.contacts.db.entity.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
 
@@ -33,20 +38,25 @@ public class MainActivity extends AppCompatActivity {
     ContactsAdapter contactsAdapter;
     ArrayList<Contact> contacts = new ArrayList<>();
     RecyclerView recyclerView;
-    DatabaseHelper db;
-
+    Button btn;
+    private ContactsAppDatabase contactsAppDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("My Contacts");
+
+        //Database
+        contactsAppDatabase = Room.databaseBuilder(getApplicationContext(),
+                ContactsAppDatabase.class,
+                "ContactDB").allowMainThreadQueries().build();
         //RecyclerView
         recyclerView = findViewById(R.id.recycler_view_contacts);
-        db = new DatabaseHelper(this);
-        contacts.addAll(db.getAllContacts());
+        contacts.addAll(contactsAppDatabase.getContactDAO().getContacts());
         contactsAdapter = new ContactsAdapter(this,contacts,MainActivity.this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -73,7 +83,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,"Contact deleted",Toast.LENGTH_LONG).show();
             }
         }).attachToRecyclerView(recyclerView);
+
+
     }
+
+
+
     public void addAndEditContacts(boolean isUpdated, Contact contact, int position){
         LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
         View view = layoutInflater.inflate(R.layout.add_contact,null);
@@ -101,6 +116,11 @@ public class MainActivity extends AppCompatActivity {
                     dialogInterface.cancel();
                 }
             }
+        }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
         });
         final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -123,22 +143,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     private void deleteContact(Contact contact, int position){
         contacts.remove(position);
-        db.deleteContact(contact);
+        contactsAppDatabase.getContactDAO().deleteContact(contact);
         contactsAdapter.notifyDataSetChanged();
     }
     private void updateContact(String name, String email, int position){
         Contact contact =contacts.get(position);
         contact.setName(name);
         contact.setEmail(email);
-        db.updateContact(contact);
+        contactsAppDatabase.getContactDAO().updateContact(contact);
         contacts.set(position,contact);
         contactsAdapter.notifyDataSetChanged();
     }
     private void createContact(String name, String email){
-        long id = db.insertContact(name,email);
-        Contact contact = db.getContact(id);
+        long id = contactsAppDatabase.getContactDAO().addContact(new Contact(name,email,0));
+        Contact contact = contactsAppDatabase.getContactDAO().getContact(id);
         if(contact != null){
             contacts.add(0, contact);
             contactsAdapter.notifyDataSetChanged();

@@ -6,17 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.contacts.MainActivity;
 import com.example.contacts.R;
-import com.example.contacts.db.Contact;
+import com.example.contacts.db.entity.Contact;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyViewHolder> {
     ArrayList<Contact> contacts;
