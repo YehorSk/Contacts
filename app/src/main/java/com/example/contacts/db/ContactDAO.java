@@ -19,8 +19,10 @@ public interface ContactDAO {
     public void updateContact(Contact contact);
     @Delete
     public void deleteContact(Contact contact);
-    @Query("select * from contacts")
-    public List<Contact> getContacts();
+    @Query("select * from contacts order by contact_name ASC")
+    public List<Contact> getContactsAsc();
+    @Query("select * from contacts order by contact_name DESC")
+    public List<Contact> getContactsDesc();
     @Query("select * from contacts where contact_id ==:id")
     public Contact getContact(long id);
 }

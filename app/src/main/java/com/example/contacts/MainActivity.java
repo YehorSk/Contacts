@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.contacts.adapter.ContactsAdapter;
 import com.example.contacts.db.ContactsAppDatabase;
+import com.example.contacts.db.UserAppDatabase;
 import com.example.contacts.db.entity.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Button btn;
     private ContactsAppDatabase contactsAppDatabase;
+    private UserAppDatabase userAppDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +56,16 @@ public class MainActivity extends AppCompatActivity {
         contactsAppDatabase = Room.databaseBuilder(getApplicationContext(),
                 ContactsAppDatabase.class,
                 "ContactDB").allowMainThreadQueries().build();
+        userAppDatabase = Room.databaseBuilder(getApplicationContext(),
+                UserAppDatabase.class,
+                "UserDB").allowMainThreadQueries().build();
         //RecyclerView
         recyclerView = findViewById(R.id.recycler_view_contacts);
-        contacts.addAll(contactsAppDatabase.getContactDAO().getContacts());
+        if(userAppDatabase.getUserDAO().getOrder().equals("desc")){
+            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
+        }else{
+            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsAsc());
+        }
         contactsAdapter = new ContactsAdapter(this,contacts,MainActivity.this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -177,6 +186,14 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.action_settings){
             return true;
+        }else if(id == R.id.action_order_desc){
+            userAppDatabase.getUserDAO().setOrder("asc");
+            finish();
+            startActivity(getIntent());
+        }else if(id == R.id.action_order_desc){
+            userAppDatabase.getUserDAO().setOrder("desc");
+            finish();
+            startActivity(getIntent());
         }
         return super.onOptionsItemSelected(item);
     }

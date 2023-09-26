@@ -7,4 +7,14 @@
         android:orderInCategory="100"
         android:title="Settings"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_order_desc"
+        android:orderInCategory="100"
+        android:title="Descending order"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_order_asc"
+        android:orderInCategory="100"
+        android:title="Ascending order"
+        app:showAsAction="never"/>
 </menu>
