@@ -17,4 +17,9 @@
         android:orderInCategory="100"
         android:title="Ascending order"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/mode"
+        android:orderInCategory="100"
+        android:title="Dark Mode"
+        app:showAsAction="never"/>
 </menu>

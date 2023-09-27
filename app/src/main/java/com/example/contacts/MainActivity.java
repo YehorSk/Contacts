@@ -3,6 +3,7 @@ package com.example.contacts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -38,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private ContactsAppDatabase contactsAppDatabase;
     private final String SHARED_PREFS = "shared_prefs";
     private String RecyclerViewOrder = "asc";
+    private String NightMode = "false";
     private String order;
+    private Boolean mode = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +59,11 @@ public class MainActivity extends AppCompatActivity {
         //RecyclerView
         recyclerView = findViewById(R.id.recycler_view_contacts);
         loadData();
+        if(mode){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }else{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
         if(order.equals("desc")){
             contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
         }else{
@@ -176,16 +184,22 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void saveData(String order){
+    public void changeOrderSaveData(String order){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(RecyclerViewOrder, order);
         editor.apply();
-        Toast.makeText(MainActivity.this, "Order changed to "+ order, Toast.LENGTH_LONG).show();
+    }
+    public void modeSaveData(Boolean mode){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(NightMode, mode);
+        editor.apply();
     }
     public void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         order = sharedPreferences.getString(RecyclerViewOrder,"");
+        mode = sharedPreferences.getBoolean(NightMode,false);
     }
 
     @Override
@@ -194,14 +208,24 @@ public class MainActivity extends AppCompatActivity {
         if(id == R.id.action_settings){
             return true;
         }else if(id == R.id.action_order_asc){
-            saveData("asc");
+            changeOrderSaveData("asc");
             finish();
             startActivity(getIntent());
         }else if(id == R.id.action_order_desc){
-            saveData("desc");
+            changeOrderSaveData("desc");
+            finish();
+            startActivity(getIntent());
+        }else if(id == R.id.mode){
+            modeSaveData(!mode);
+            if(mode){
+                item.setTitle("Light Mode");
+            }else{
+                item.setTitle("Dark Mode");
+            }
             finish();
             startActivity(getIntent());
         }
+
         return super.onOptionsItemSelected(item);
     }
 }
