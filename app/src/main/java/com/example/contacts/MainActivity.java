@@ -9,13 +9,10 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
-import androidx.room.RoomDatabase;
 
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,13 +20,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.contacts.adapter.ContactsAdapter;
 import com.example.contacts.db.ContactsAppDatabase;
-import com.example.contacts.db.UserAppDatabase;
 import com.example.contacts.db.entity.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -41,7 +36,9 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Button btn;
     private ContactsAppDatabase contactsAppDatabase;
-    private UserAppDatabase userAppDatabase;
+    private final String SHARED_PREFS = "shared_prefs";
+    private String RecyclerViewOrder = "asc";
+    private String order;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,12 +53,10 @@ public class MainActivity extends AppCompatActivity {
         contactsAppDatabase = Room.databaseBuilder(getApplicationContext(),
                 ContactsAppDatabase.class,
                 "ContactDB").allowMainThreadQueries().build();
-        userAppDatabase = Room.databaseBuilder(getApplicationContext(),
-                UserAppDatabase.class,
-                "UserDB").allowMainThreadQueries().build();
         //RecyclerView
         recyclerView = findViewById(R.id.recycler_view_contacts);
-        if(userAppDatabase.getUserDAO().getOrder().equals("desc")){
+        loadData();
+        if(order.equals("desc")){
             contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
         }else{
             contacts.addAll(contactsAppDatabase.getContactDAO().getContactsAsc());
@@ -181,17 +176,29 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void saveData(String order){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(RecyclerViewOrder, order);
+        editor.apply();
+        Toast.makeText(MainActivity.this, "Order changed to "+ order, Toast.LENGTH_LONG).show();
+    }
+    public void loadData(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        order = sharedPreferences.getString(RecyclerViewOrder,"");
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_settings){
             return true;
-        }else if(id == R.id.action_order_desc){
-            userAppDatabase.getUserDAO().setOrder("asc");
+        }else if(id == R.id.action_order_asc){
+            saveData("asc");
             finish();
             startActivity(getIntent());
         }else if(id == R.id.action_order_desc){
-            userAppDatabase.getUserDAO().setOrder("desc");
+            saveData("desc");
             finish();
             startActivity(getIntent());
         }
