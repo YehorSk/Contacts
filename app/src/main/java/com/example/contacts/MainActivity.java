@@ -59,11 +59,6 @@ public class MainActivity extends AppCompatActivity {
         //RecyclerView
         recyclerView = findViewById(R.id.recycler_view_contacts);
         loadData();
-        if(mode){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }else{
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
         if(order.equals("desc")){
             contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
         }else{
@@ -216,16 +211,16 @@ public class MainActivity extends AppCompatActivity {
             finish();
             startActivity(getIntent());
         }else if(id == R.id.mode){
-            modeSaveData(!mode);
             if(mode){
-                item.setTitle("Light Mode");
-            }else{
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 item.setTitle("Dark Mode");
+                modeSaveData(!mode);
+            }else{
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                item.setTitle("Light Mode");
+                modeSaveData(!mode);
             }
-            finish();
-            startActivity(getIntent());
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

@@ -17,6 +17,8 @@ public interface ContactDAO {
     public long addContact(Contact contact);
     @Update
     public void updateContact(Contact contact);
+    @Query("DELETE FROM contacts")
+    public void deleteAll();
     @Delete
     public void deleteContact(Contact contact);
     @Query("select * from contacts order by contact_name ASC")
