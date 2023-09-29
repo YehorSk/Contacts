@@ -45,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadData();
+        if(mode){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }else{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
         setContentView(R.layout.activity_main);
 
         //Toolbar
@@ -58,12 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 "ContactDB").allowMainThreadQueries().build();
         //RecyclerView
         recyclerView = findViewById(R.id.recycler_view_contacts);
-        loadData();
-        if(order.equals("desc")){
-            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
-        }else{
-            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsAsc());
-        }
+        checkOrder(order);
         contactsAdapter = new ContactsAdapter(this,contacts,MainActivity.this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -94,7 +95,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    public void checkOrder(String order){
+        if(order.equals("desc")){
+            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
+        }else{
+            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsAsc());
+        }
+    }
 
     public void addAndEditContacts(boolean isUpdated, Contact contact, int position){
         LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
@@ -213,13 +220,10 @@ public class MainActivity extends AppCompatActivity {
         }else if(id == R.id.mode){
             if(mode){
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                item.setTitle("Dark Mode");
-                modeSaveData(!mode);
             }else{
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                item.setTitle("Light Mode");
-                modeSaveData(!mode);
             }
+            modeSaveData(!mode);
         }
         return super.onOptionsItemSelected(item);
     }

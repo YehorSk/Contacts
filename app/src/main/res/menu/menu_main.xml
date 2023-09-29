@@ -21,6 +21,6 @@
     <item
         android:id="@+id/mode"
         android:orderInCategory="100"
-        android:title="Dark Mode"
+        android:title="Change Mode"
         app:showAsAction="never"/>
 </menu>
