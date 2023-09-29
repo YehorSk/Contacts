@@ -14,6 +14,8 @@ import androidx.room.Room;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +32,8 @@ import com.example.contacts.db.entity.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
     ContactsAdapter contactsAdapter;
@@ -62,9 +66,10 @@ public class MainActivity extends AppCompatActivity {
         contactsAppDatabase = Room.databaseBuilder(getApplicationContext(),
                 ContactsAppDatabase.class,
                 "ContactDB").allowMainThreadQueries().build();
+
         //RecyclerView
         recyclerView = findViewById(R.id.recycler_view_contacts);
-        checkOrder(order);
+        displayContactsInBg(order);
         contactsAdapter = new ContactsAdapter(this,contacts,MainActivity.this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -95,13 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void checkOrder(String order){
-        if(order.equals("desc")){
-            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
-        }else{
-            contacts.addAll(contactsAppDatabase.getContactDAO().getContactsAsc());
-        }
-    }
+
 
     public void addAndEditContacts(boolean isUpdated, Contact contact, int position){
         LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
@@ -203,6 +202,28 @@ public class MainActivity extends AppCompatActivity {
         order = sharedPreferences.getString(RecyclerViewOrder,"");
         mode = sharedPreferences.getBoolean(NightMode,false);
     }
+
+    private void displayContactsInBg(String order){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                if(order.equals("desc")){
+                    contacts.addAll(contactsAppDatabase.getContactDAO().getContactsDesc());
+                }else{
+                    contacts.addAll(contactsAppDatabase.getContactDAO().getContactsAsc());
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        contactsAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
